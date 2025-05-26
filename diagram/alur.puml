@@ -1,0 +1,35 @@
+@startuml
+start
+
+:User login ke sistem;
+:User buka form input transaksi kas;
+
+partition "Form Input" {
+  :Pilih akun kas (cash_account);
+  :Pilih kategori transaksi;
+  :Isi jumlah uang (amount);
+  :Tentukan jenis (income/expense);
+  :Isi deskripsi (optional);
+  :Klik tombol 'Simpan';
+}
+
+partition "Sistem" {
+  :Validasi data input;
+  if (Valid?) then (ya)
+    :Simpan data ke cash_transactions;
+    :Ambil saldo terakhir dari cash_accounts;
+    if (jenis = income) then (ya)
+      :Tambah saldo;
+    else
+      :Kurangi saldo;
+    endif
+    :Update saldo akun kas;
+    :Catat perubahan saldo ke cash_balance_logs;
+    :Tampilkan notifikasi "Berhasil disimpan";
+  else (tidak)
+    :Tampilkan error validasi;
+  endif
+}
+
+stop
+@enduml

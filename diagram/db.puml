@@ -1,0 +1,56 @@
+@startuml
+' Definisi class User
+class User {
+  +id: int
+  +username: string
+  +password: string
+  +fullName: string
+  +role: string
+  +createdAt: timestamp
+  +updatedAt: timestamp
+}
+
+' Definisi class CashAccount
+class CashAccount {
+  +id: int
+  +name: string
+  +description: string
+  +balance: decimal(14,2)
+  +createdAt: timestamp
+  +updatedAt: timestamp
+}
+
+' Definisi class TransactionCategory
+class TransactionCategory {
+  +id: int
+  +name: string
+  +type: string
+  +description: string
+}
+
+' Definisi class CashTransaction
+class CashTransaction {
+  +id: int
+  +transactionDate: timestamp
+  +amount: decimal(14,2)
+  +description: string
+  +type: string
+  +createdAt: timestamp
+}
+
+' Definisi class CashBalanceLog
+class CashBalanceLog {
+  +id: int
+  +balanceAfter: decimal(14,2)
+  +loggedAt: timestamp
+}
+
+' Relasi antar class
+
+User "1" <-- "0..*" CashTransaction : creates/records >
+CashAccount "1" <-- "0..*" CashTransaction : transactions >
+CashAccount "1" <-- "0..*" CashBalanceLog : balance_logs >
+TransactionCategory "1" <-- "0..*" CashTransaction : categorized_by >
+CashTransaction "1" <-- "0..*" CashBalanceLog : logged_in >
+
+@enduml
