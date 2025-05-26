@@ -1,26 +1,56 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CashAccount } from './entities/cash-account.entity';
 import { CreateCashAccountDto } from './dto/create-cash-account.dto';
 import { UpdateCashAccountDto } from './dto/update-cash-account.dto';
 
 @Injectable()
 export class CashAccountsService {
-  create(createCashAccountDto: CreateCashAccountDto) {
-    return 'This action adds a new cashAccount';
+  constructor(
+    @InjectRepository(CashAccount)
+    private readonly cashAccountRepository: Repository<CashAccount>,
+  ) {}
+
+  async create(createCashAccountDto: CreateCashAccountDto) {
+    const cashAccount = this.cashAccountRepository.create(createCashAccountDto);
+    return this.cashAccountRepository.save(cashAccount);
   }
 
-  findAll() {
-    return `This action returns all cashAccounts`;
+  async findAll() {
+    return this.cashAccountRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} cashAccount`;
+  async findOne(id: number) {
+    const cashAccount = await this.cashAccountRepository.findOne({
+      where: { id },
+      relations: ['cashTransactions', 'balanceLogs'],
+    });
+    if (!cashAccount) {
+      throw new NotFoundException(`CashAccount with id ${id} not found`);
+    }
+    return cashAccount;
   }
 
-  update(id: number, updateCashAccountDto: UpdateCashAccountDto) {
-    return `This action updates a #${id} cashAccount`;
+  async update(id: number, updateCashAccountDto: UpdateCashAccountDto) {
+    const cashAccount = await this.cashAccountRepository.preload({
+      id,
+      ...updateCashAccountDto,
+    });
+    if (!cashAccount) {
+      throw new NotFoundException(`CashAccount with id ${id} not found`);
+    }
+    return this.cashAccountRepository.save(cashAccount);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} cashAccount`;
+  async remove(id: number) {
+    const cashAccount = await this.cashAccountRepository.findOne({
+      where: { id },
+    });
+    if (!cashAccount) {
+      throw new NotFoundException(`CashAccount with id ${id} not found`);
+    }
+    await this.cashAccountRepository.remove(cashAccount);
+    return { message: `CashAccount with id ${id} has been removed` };
   }
 }

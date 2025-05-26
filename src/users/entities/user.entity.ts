@@ -11,7 +11,7 @@ import {
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn() // Perbaikan: gunakan auto increment
+  @PrimaryGeneratedColumn() 
   id: number;
 
   @Column({ length: 50, unique: true })

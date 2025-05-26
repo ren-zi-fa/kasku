@@ -21,7 +21,7 @@ export class CashTransaction {
   id: number;
 
   @Column({ type: 'text' })
-  description: number;
+  description: string;
 
   @CreateDateColumn({ name: 'transaction_date' })
   transactionDate: Date;

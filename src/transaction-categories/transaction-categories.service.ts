@@ -1,26 +1,61 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { TransactionCategory } from './entities/transaction-category.entity';
 import { CreateTransactionCategoryDto } from './dto/create-transaction-category.dto';
 import { UpdateTransactionCategoryDto } from './dto/update-transaction-category.dto';
 
 @Injectable()
 export class TransactionCategoriesService {
-  create(createTransactionCategoryDto: CreateTransactionCategoryDto) {
-    return 'This action adds a new transactionCategory';
+  constructor(
+    @InjectRepository(TransactionCategory)
+    private readonly transactionCategoryRepository: Repository<TransactionCategory>,
+  ) {}
+
+  async create(createDto: CreateTransactionCategoryDto) {
+    const category = this.transactionCategoryRepository.create(createDto);
+    return this.transactionCategoryRepository.save(category);
   }
 
-  findAll() {
-    return `This action returns all transactionCategories`;
+  async findAll() {
+    return this.transactionCategoryRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} transactionCategory`;
+  async findOne(id: number) {
+    const category = await this.transactionCategoryRepository.findOne({
+      where: { id },
+    });
+    if (!category) {
+      throw new NotFoundException(
+        `TransactionCategory with id ${id} not found`,
+      );
+    }
+    return category;
   }
 
-  update(id: number, updateTransactionCategoryDto: UpdateTransactionCategoryDto) {
-    return `This action updates a #${id} transactionCategory`;
+  async update(id: number, updateDto: UpdateTransactionCategoryDto) {
+    const category = await this.transactionCategoryRepository.preload({
+      id,
+      ...updateDto,
+    });
+    if (!category) {
+      throw new NotFoundException(
+        `TransactionCategory with id ${id} not found`,
+      );
+    }
+    return this.transactionCategoryRepository.save(category);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} transactionCategory`;
+  async remove(id: number) {
+    const category = await this.transactionCategoryRepository.findOne({
+      where: { id },
+    });
+    if (!category) {
+      throw new NotFoundException(
+        `TransactionCategory with id ${id} not found`,
+      );
+    }
+    await this.transactionCategoryRepository.remove(category);
+    return { message: `TransactionCategory with id ${id} has been removed` };
   }
 }
