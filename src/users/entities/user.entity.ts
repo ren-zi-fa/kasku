@@ -8,17 +8,17 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn() 
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ length: 50, unique: true })
   username: string;
 
-  @Column({ name: 'password', length: 100 })
+  @Column({ name: 'password', length: 100, select: false })
   password: string;
+
   @Column({ length: 20, default: 'staff' })
   role: string;
 

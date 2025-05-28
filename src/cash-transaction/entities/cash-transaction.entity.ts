@@ -27,6 +27,7 @@ export class CashTransaction {
   transactionDate: Date;
 
   @IsEnum(TransactionType, { message: 'type harus income atau expense' })
+  @Column({ type: 'varchar' })
   type: TransactionType;
 
   @CreateDateColumn({ name: 'created_at' })

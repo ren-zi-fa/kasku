@@ -9,15 +9,15 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
-  origin: 'http://localhost:3000',
-  credentials: true,
-});
+    origin: ['http://localhost:3000', 'http://localhost:3100'],
+    credentials: true,
+  });
 
   app.useGlobalInterceptors(new ResponseInterceptor(reflector));
   const config = new DocumentBuilder()
     .setTitle('KasKu')
     .setDescription('Api Untuk KasKu')
-    .addServer("http://localhost:3000")
+    .addServer('http://localhost:3100')
     .setVersion('1.0')
     .addTag('KasKu')
     .build();

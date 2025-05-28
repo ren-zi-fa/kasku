@@ -12,6 +12,8 @@ export class CreateCashTransactionDto {
   @IsNotEmpty()
   description: string;
 
+  @IsString()
+  @IsNotEmpty()
   @IsEnum(TransactionType, { message: 'type harus income atau expense' })
   type: TransactionType;
 
