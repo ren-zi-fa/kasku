@@ -47,4 +47,8 @@ export class UsersService {
     await this.userRepository.remove(user);
     return { message: `User with id ${id} has been removed` };
   }
+
+  async findByUsername(username: string) {
+    return this.userRepository.findOne({ where: { username } });
+  }
 }

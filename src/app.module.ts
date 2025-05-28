@@ -8,19 +8,21 @@ import { TransactionCategoriesModule } from './transaction-categories/transactio
 import { CashTransactionModule } from './cash-transaction/cash-transaction.module';
 import { CashBalanceLogsModule } from './cash-balance-logs/cash-balance-logs.module';
 import { DatabaseModule } from './config/database/databse.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
-    UsersModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
     }),
+    UsersModule,
     DatabaseModule,
     CashAccountsModule,
     TransactionCategoriesModule,
     CashTransactionModule,
     CashBalanceLogsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

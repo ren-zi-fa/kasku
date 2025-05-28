@@ -1,4 +1,5 @@
 @startuml
+
 ' Definisi class User
 class User {
   +id: int
@@ -36,6 +37,11 @@ class CashTransaction {
   +description: string
   +type: string
   +createdAt: timestamp
+
+  ' Foreign keys
+  +userId: int
+  +cashAccountId: int
+  +transactionCategoryId: int
 }
 
 ' Definisi class CashBalanceLog
@@ -43,14 +49,17 @@ class CashBalanceLog {
   +id: int
   +balanceAfter: decimal(14,2)
   +loggedAt: timestamp
+
+  ' Foreign keys
+  +cashTransactionId: int
+  +cashAccountId: int
 }
 
 ' Relasi antar class
-
 User "1" <-- "0..*" CashTransaction : creates/records >
 CashAccount "1" <-- "0..*" CashTransaction : transactions >
-CashAccount "1" <-- "0..*" CashBalanceLog : balance_logs >
 TransactionCategory "1" <-- "0..*" CashTransaction : categorized_by >
 CashTransaction "1" <-- "0..*" CashBalanceLog : logged_in >
+CashAccount "1" <-- "0..*" CashBalanceLog : balance_logs >
 
 @enduml
