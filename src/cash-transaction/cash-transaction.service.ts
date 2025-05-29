@@ -21,9 +21,12 @@ export class CashTransactionService {
     private readonly transactionCategoryRepository: Repository<TransactionCategory>,
   ) {}
 
-  async create(createCashTransactionDto: CreateCashTransactionDto) {
+  async create(
+    createCashTransactionDto: CreateCashTransactionDto,
+    userId: number,
+  ) {
     const user = await this.userRepository.findOne({
-      where: { id: createCashTransactionDto.userId },
+      where: { id: userId },
     });
     const account = await this.cashAccountRepository.findOne({
       where: { id: createCashTransactionDto.cashAccountId },

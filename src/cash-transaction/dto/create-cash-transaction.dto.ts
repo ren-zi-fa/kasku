@@ -1,5 +1,6 @@
 import {
   IsEnum,
+  isInt,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -17,13 +18,9 @@ export class CreateCashTransactionDto {
   @IsEnum(TransactionType, { message: 'type harus income atau expense' })
   type: TransactionType;
 
-  @IsString()
-  @IsNotEmpty()
-  amount: string;
-
   @IsNumber()
   @IsNotEmpty()
-  userId: number;
+  amount: string;
 
   @IsNumber()
   @IsNotEmpty()

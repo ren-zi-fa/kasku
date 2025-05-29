@@ -16,7 +16,7 @@ export class User {
   @Column({ length: 50, unique: true })
   username: string;
 
-  @Column({ name: 'password', length: 100, select: false })
+  @Column({ name: 'password', length: 100})
   password: string;
 
   @Column({ length: 20, default: 'staff' })
