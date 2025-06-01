@@ -9,6 +9,8 @@ import { CashTransactionModule } from './cash-transaction/cash-transaction.modul
 import { CashBalanceLogsModule } from './cash-balance-logs/cash-balance-logs.module';
 import { DatabaseModule } from './config/database/databse.module';
 import { AuthModule } from './auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './auth/roles.guard';
 
 @Module({
   imports: [

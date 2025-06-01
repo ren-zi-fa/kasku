@@ -17,7 +17,9 @@ export class UsersService {
   }
 
   async findAll() {
-    return this.userRepository.find();
+    return this.userRepository.find({
+      select: ['id', 'username', 'role', 'cashTransactions'],
+    });
   }
 
   async findOne(id: number) {
