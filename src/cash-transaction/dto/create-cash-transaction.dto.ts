@@ -7,6 +7,7 @@ import {
   IsString,
 } from 'class-validator';
 import { TransactionType } from '../entities/cash-transaction.entity';
+import { Type } from 'class-transformer';
 
 export class CreateCashTransactionDto {
   @IsString()
@@ -20,6 +21,7 @@ export class CreateCashTransactionDto {
 
   @IsNumber()
   @IsNotEmpty()
+  @Type(() => Number)
   amount: string;
 
   @IsNumber()

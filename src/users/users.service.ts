@@ -4,6 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 
 @Injectable()
 export class UsersService {
@@ -16,10 +17,46 @@ export class UsersService {
     return this.userRepository.save(user);
   }
 
-  async findAll() {
-    return this.userRepository.find({
-      select: ['id', 'username', 'role', 'cashTransactions'],
-    });
+  async findAll(query: PaginationQueryDto) {
+    const {
+      search,
+      page = 1,
+      limit = 10,
+      sortBy = 'id',
+      order = 'ASC',
+      filters,
+    } = query;
+    const qb = this.userRepository.createQueryBuilder('user');
+
+    if (search) {
+      qb.andWhere('user.username LIKE :search', { search: `%${search}%` });
+    }
+
+    // Dynamic filter (contoh filters = { role: 'admin' })
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        // Bisa buat validasi key dulu agar aman
+        qb.andWhere(`user.${key} = :${key}`, { [key]: value });
+      });
+    }
+
+    // Sorting
+    qb.orderBy(
+      `user.${sortBy}`,
+      order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC',
+    );
+
+    // Pagination
+    qb.skip((page - 1) * limit).take(limit);
+
+    const [data, total] = await qb.getManyAndCount();
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
   }
 
   async findOne(id: number) {

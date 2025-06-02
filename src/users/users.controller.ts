@@ -7,13 +7,18 @@ import {
   Param,
   Delete,
   UseGuards,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 
 @Controller('users')
+@UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -25,8 +30,15 @@ export class UsersController {
 
   @UseGuards(AuthGuard)
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async findAll(@Query() query: PaginationQueryDto) {
+    if (typeof query.filters === 'string') {
+      try {
+        query.filters = JSON.parse(query.filters);
+      } catch (error) {
+        query.filters = {};
+      }
+    }
+    return this.usersService.findAll(query);
   }
 
   @UseGuards(AuthGuard)

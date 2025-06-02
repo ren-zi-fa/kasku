@@ -30,7 +30,7 @@ export class TransactionCategoriesController {
 
   @UseGuards(RolesGuard)
   @Get()
-  @Roles(Role.Admin)
+  @Roles(Role.Staff)
   findAll() {
     return this.transactionCategoriesService.findAll();
   }
