@@ -42,7 +42,11 @@ export class CashTransactionController {
         query.filters = {};
       }
     }
-    return this.cashTransactionService.findAll(query);
+    const result = await this.cashTransactionService.findAll(query);
+    return {
+      data: result.data,
+      meta: result.meta,
+    };
   }
 
   @Get(':id')

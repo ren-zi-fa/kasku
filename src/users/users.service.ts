@@ -17,47 +17,47 @@ export class UsersService {
     return this.userRepository.save(user);
   }
 
-  async findAll(query: PaginationQueryDto) {
-    const {
-      search,
-      page = 1,
-      limit = 10,
-      sortBy = 'id',
-      order = 'ASC',
-      filters,
-    } = query;
-    const qb = this.userRepository.createQueryBuilder('user');
+ async findAll(query: PaginationQueryDto) {
+  const {
+    search,
+    page = 1,
+    limit = 10,
+    sortBy = 'id',
+    order = 'ASC',
+    filters,
+  } = query;
 
-    if (search) {
-      qb.andWhere('user.username LIKE :search', { search: `%${search}%` });
-    }
+  const qb = this.userRepository.createQueryBuilder('user');
 
-    // Dynamic filter (contoh filters = { role: 'admin' })
-    if (filters) {
-      Object.entries(filters).forEach(([key, value]) => {
-        // Bisa buat validasi key dulu agar aman
-        qb.andWhere(`user.${key} = :${key}`, { [key]: value });
-      });
-    }
+  if (search) {
+    qb.andWhere('user.username LIKE :search', { search: `%${search}%` });
+  }
 
-    // Sorting
-    qb.orderBy(
-      `user.${sortBy}`,
-      order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC',
-    );
+  if (filters) {
+    Object.entries(filters).forEach(([key, value]) => {
+      qb.andWhere(`user.${key} = :${key}`, { [key]: value });
+    });
+  }
 
-    // Pagination
-    qb.skip((page - 1) * limit).take(limit);
+  qb.orderBy(
+    `user.${sortBy}`,
+    order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC',
+  );
 
-    const [data, total] = await qb.getManyAndCount();
+  qb.skip((page - 1) * limit).take(limit);
 
-    return {
-      data,
+  const [data, total] = await qb.getManyAndCount();
+
+  return {
+    data,
+    meta: {
       total,
       page,
       limit,
-    };
-  }
+    },
+  };
+}
+
 
   async findOne(id: number) {
     const user = await this.userRepository.findOne({ where: { id } });

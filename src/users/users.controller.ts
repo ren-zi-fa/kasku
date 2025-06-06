@@ -38,7 +38,11 @@ export class UsersController {
         query.filters = {};
       }
     }
-    return this.usersService.findAll(query);
+    const result = await this.usersService.findAll(query);
+    return {
+      data: result.data,
+      meta: result.meta,
+    };
   }
 
   @UseGuards(AuthGuard)

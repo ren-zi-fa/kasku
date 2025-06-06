@@ -117,10 +117,12 @@ export class CashTransactionService {
     const [data, total] = await qb.getManyAndCount();
 
     return {
-      data,
-      total,
-      page,
-      limit,
+      data: data,
+      meta:{
+        total,
+        page,
+        limit
+      }
     };
   }
 
