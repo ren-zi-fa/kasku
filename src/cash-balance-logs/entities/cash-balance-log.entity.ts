@@ -25,9 +25,9 @@ export class CashBalanceLog {
   })
   balanceAfter: string;
 
-  @ManyToOne(() => CashAccount, (acc) => acc.balanceLogs)
-  cashAccount: CashAccount;
+  @ManyToOne(() => CashAccount, (acc) => acc.cash_balance_log)
+  cash_account: CashAccount;
 
-  @ManyToOne(() => CashTransaction, (tx) => tx.balanceLogs)
-  cashTransaction: CashTransaction;
+  @ManyToOne(() => CashTransaction, (tx) => tx.cash_balance_log)
+  cash_transaction: CashTransaction;
 }

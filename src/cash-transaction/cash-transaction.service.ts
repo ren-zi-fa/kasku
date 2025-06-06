@@ -3,10 +3,11 @@ import { CreateCashTransactionDto } from './dto/create-cash-transaction.dto';
 import { UpdateCashTransactionDto } from './dto/update-cash-transaction.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CashTransaction } from './entities/cash-transaction.entity';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { CashAccount } from 'src/cash-accounts/entities/cash-account.entity';
 import { TransactionCategory } from 'src/transaction-categories/entities/transaction-category.entity';
+import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
 
 @Injectable()
 export class CashTransactionService {
@@ -39,8 +40,8 @@ export class CashTransactionService {
       amount: createCashTransactionDto.amount,
       type: createCashTransactionDto.type,
       transactionDate: createCashTransactionDto.transactionDate,
-      cashAccount: account,
-      category: category,
+      cash_account: account,
+      transaction_category: category,
       user,
     });
     const saved = await this.cashTransactionRepository.save(transaction);
@@ -55,16 +56,78 @@ export class CashTransactionService {
     };
   }
 
-  findAll() {
-    return this.cashTransactionRepository.find({
-      relations: ['user', 'cashAccount', 'category'],
-    });
+  async findAll(query: PaginationQueryDto) {
+    const {
+      search,
+      page = 1,
+      limit = 10,
+      sortBy = 'id',
+      order = 'ASC',
+      filters,
+    } = query;
+
+    const qb =
+      this.cashTransactionRepository.createQueryBuilder('cash_transaction');
+
+    // LEFT JOIN relasi
+    qb.leftJoin('cash_transaction.user', 'user')
+      .leftJoin('cash_transaction.cash_account', 'cash_account')
+      .leftJoin(
+        'cash_transaction.transaction_category',
+        'transaction_category',
+      );
+
+    // Filter by search keyword
+    if (search) {
+      qb.andWhere(
+        new Brackets((qb) => {
+          qb.where('cash_transaction.description ILIKE :search', {
+            search: `%${search}%`,
+          })
+            .orWhere('user.username ILIKE :search', { search: `%${search}%` })
+            .orWhere('cash_account.name ILIKE :search', {
+              search: `%${search}%`,
+            })
+            .orWhere('transaction_category.name ILIKE :search', {
+              search: `%${search}%`,
+            });
+        }),
+      );
+    }
+
+    // Dynamic filters (optional)
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        qb.andWhere(`cash_transaction.${key} = :${key}`, { [key]: value });
+      });
+    }
+
+    // Sorting
+    qb.orderBy(
+      `cash_transaction.${sortBy}`,
+      order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC',
+    );
+
+    // Pagination
+    qb.skip((page - 1) * limit).take(limit);
+
+    // Debugging (optional)
+    // console.log(qb.getSql(), qb.getParameters());
+
+    const [data, total] = await qb.getManyAndCount();
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
   }
 
   findOne(id: number) {
     return this.cashTransactionRepository.findOne({
       where: { id },
-      relations: ['user', 'cashAccount', 'category', 'balanceLogs'],
+      relations: ['user', 'cash_account', 'category', 'cash_balance_log'],
     });
   }
 

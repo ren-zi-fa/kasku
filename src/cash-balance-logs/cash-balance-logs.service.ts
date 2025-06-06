@@ -15,7 +15,7 @@ export class CashBalanceLogsService {
   async create(createDto: CreateCashBalanceLogDto) {
     const log = this.cashBalanceLogRepository.create({
       ...createDto,
-      cashAccount: { id: +createDto.cashAccountId },
+      cash_account: { id: +createDto.cashAccountId },
     });
     return this.cashBalanceLogRepository.save(log);
   }
@@ -39,7 +39,7 @@ export class CashBalanceLogsService {
     const log = await this.cashBalanceLogRepository.preload({
       id,
       ...updateDto,
-      cashAccount: updateDto.cashAccountId
+      cash_account: updateDto.cashAccountId
         ? { id: +updateDto.cashAccountId }
         : undefined,
     });

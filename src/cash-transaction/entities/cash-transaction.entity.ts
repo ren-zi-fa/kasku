@@ -9,17 +9,14 @@ import {
   Entity,
   ManyToOne,
   OneToMany,
-  PrimaryGeneratedColumn,
 } from 'typeorm';
+import { AbstractCashTransactionEntity } from './abstract.cash-transaction';
 export enum TransactionType {
   INCOME = 'income',
   EXPENSE = 'expense',
 }
 @Entity('cash_transaction')
-export class CashTransaction {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class CashTransaction extends AbstractCashTransactionEntity {
   @Column({ type: 'text' })
   description: string;
 
@@ -30,21 +27,18 @@ export class CashTransaction {
   @Column({ type: 'varchar' })
   type: TransactionType;
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
-
   @Column({ type: 'numeric', precision: 14, scale: 2, default: 0 })
   amount: string;
 
-  @ManyToOne(() => User, (user) => user.cashTransactions)
+  @ManyToOne(() => User, (user) => user.cash_transaction)
   user: User;
 
-  @ManyToOne(() => CashAccount, (acc) => acc.cashTransactions)
-  cashAccount: CashAccount;
+  @ManyToOne(() => CashAccount, (acc) => acc.cash_transaction)
+  cash_account: CashAccount;
 
-  @ManyToOne(() => TransactionCategory, (cat) => cat.cashTransactions)
-  category: TransactionCategory;
+  @ManyToOne(() => TransactionCategory, (cat) => cat.cash_transaction)
+  transaction_category: TransactionCategory;
 
-  @OneToMany(() => CashBalanceLog, (log) => log.cashTransaction)
-  balanceLogs: CashBalanceLog[];
+  @OneToMany(() => CashBalanceLog, (log) => log.cash_transaction)
+  cash_balance_log: CashBalanceLog[];
 }

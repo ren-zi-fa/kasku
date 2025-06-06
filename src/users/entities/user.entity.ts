@@ -11,5 +11,5 @@ export class User extends AbstractUserEntity {
   public role: string;
 
   @OneToMany(() => CashTransaction, (tx) => tx.user)
-  public cashTransactions: CashTransaction[];
+  public cash_transaction: CashTransaction[];
 }

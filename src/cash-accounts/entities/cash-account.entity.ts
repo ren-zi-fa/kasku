@@ -29,9 +29,9 @@ export class CashAccount {
   @Column({ type: 'numeric', precision: 14, scale: 2, default: 0 })
   balance: string;
 
-  @OneToMany(() => CashTransaction, (tx) => tx.cashAccount)
-  cashTransactions: CashTransaction[];
+  @OneToMany(() => CashTransaction, (tx) => tx.cash_account)
+  cash_transaction: CashTransaction[];
 
-  @OneToMany(() => CashBalanceLog, (log) => log.cashAccount)
-  balanceLogs: CashBalanceLog[];
+  @OneToMany(() => CashBalanceLog, (log) => log.cash_account)
+  cash_balance_log: CashBalanceLog[];
 }

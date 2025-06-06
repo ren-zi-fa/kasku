@@ -22,6 +22,6 @@ export class TransactionCategory {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @OneToMany(() => CashTransaction, (tx) => tx.category)
-  cashTransactions: CashTransaction[];
+  @OneToMany(() => CashTransaction, (tx) => tx.transaction_category)
+  cash_transaction: CashTransaction[];
 }
