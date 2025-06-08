@@ -39,7 +39,7 @@ export class CashTransactionService {
       description: createCashTransactionDto.description,
       amount: createCashTransactionDto.amount,
       type: createCashTransactionDto.type,
-      transactionDate: createCashTransactionDto.transactionDate,
+      transaction_date: createCashTransactionDto.transaction_date,
       cash_account: account,
       transaction_category: category,
       user,
@@ -51,8 +51,8 @@ export class CashTransactionService {
       description: saved.description,
       amount: saved.amount,
       type: saved.type,
-      transactionDate: saved.transactionDate,
-      createdAt: saved.createdAt,
+      transaction_date: saved.transaction_date,
+      created_at: saved.created_at,
     };
   }
 
@@ -70,9 +70,9 @@ export class CashTransactionService {
       this.cashTransactionRepository.createQueryBuilder('cash_transaction');
 
     // LEFT JOIN relasi
-    qb.leftJoin('cash_transaction.user', 'user')
-      .leftJoin('cash_transaction.cash_account', 'cash_account')
-      .leftJoin(
+    qb.leftJoinAndSelect('cash_transaction.user', 'user')
+      .leftJoinAndSelect('cash_transaction.cash_account', 'cash_account')
+      .leftJoinAndSelect(
         'cash_transaction.transaction_category',
         'transaction_category',
       );
@@ -115,14 +115,19 @@ export class CashTransactionService {
     // console.log(qb.getSql(), qb.getParameters());
 
     const [data, total] = await qb.getManyAndCount();
-
+    const pageCount = Math.ceil(total / limit);
+    const hasNext = page < pageCount;
+    const hasPrev = page > 1;
     return {
-      data: data,
-      meta:{
+      data,
+      meta: {
         total,
         page,
-        limit
-      }
+        limit,
+        pageCount,
+        hasNext,
+        hasPrev,
+      },
     };
   }
 

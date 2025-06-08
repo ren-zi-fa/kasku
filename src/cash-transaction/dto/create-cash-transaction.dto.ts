@@ -33,5 +33,5 @@ export class CreateCashTransactionDto {
   categoryId: number;
 
   @IsOptional()
-  transactionDate?: Date;
+  transaction_date?: Date;
 }

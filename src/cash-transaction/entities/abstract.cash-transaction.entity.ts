@@ -1,16 +1,14 @@
 import { Exclude } from 'class-transformer';
 import { CreateDateColumn, PrimaryGeneratedColumn } from 'typeorm';
 
-export class AbstractCashTransactionEntity {
+export abstract class AbstractCashTransactionEntity {
   @PrimaryGeneratedColumn()
   @Exclude()
   public id: number;
 
   @CreateDateColumn({ name: 'transaction_date' })
-  @Exclude()
-  public transactionDate: Date;
+  public transaction_date: Date;
 
   @CreateDateColumn({ name: 'created_at' })
-  @Exclude()
-  public createdAt: Date;
+  public created_at: Date;
 }

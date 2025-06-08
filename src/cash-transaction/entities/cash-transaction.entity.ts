@@ -10,7 +10,7 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { AbstractCashTransactionEntity } from './abstract.cash-transaction';
+import { AbstractCashTransactionEntity } from './abstract.cash-transaction.entity';
 export enum TransactionType {
   INCOME = 'income',
   EXPENSE = 'expense',
@@ -18,27 +18,24 @@ export enum TransactionType {
 @Entity('cash_transaction')
 export class CashTransaction extends AbstractCashTransactionEntity {
   @Column({ type: 'text' })
-  description: string;
-
-  @CreateDateColumn({ name: 'transaction_date' })
-  transactionDate: Date;
+  public description: string;
 
   @IsEnum(TransactionType, { message: 'type harus income atau expense' })
   @Column({ type: 'varchar' })
-  type: TransactionType;
+  public type: TransactionType;
 
   @Column({ type: 'numeric', precision: 14, scale: 2, default: 0 })
-  amount: string;
+  public amount: string;
 
   @ManyToOne(() => User, (user) => user.cash_transaction)
-  user: User;
+  public user: User;
 
   @ManyToOne(() => CashAccount, (acc) => acc.cash_transaction)
-  cash_account: CashAccount;
+  public cash_account: CashAccount;
 
   @ManyToOne(() => TransactionCategory, (cat) => cat.cash_transaction)
-  transaction_category: TransactionCategory;
+  public transaction_category: TransactionCategory;
 
   @OneToMany(() => CashBalanceLog, (log) => log.cash_transaction)
-  cash_balance_log: CashBalanceLog[];
+  public cash_balance_log: CashBalanceLog[];
 }

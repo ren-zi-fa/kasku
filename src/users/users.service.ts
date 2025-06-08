@@ -16,48 +16,55 @@ export class UsersService {
     const user = this.userRepository.create(createUserDto);
     return this.userRepository.save(user);
   }
+  async findAll(query: PaginationQueryDto) {
+    const {
+      search,
+      page = 1,
+      limit = 10,
+      sortBy = 'id',
+      order = 'ASC',
+      filters,
+    } = query;
 
- async findAll(query: PaginationQueryDto) {
-  const {
-    search,
-    page = 1,
-    limit = 10,
-    sortBy = 'id',
-    order = 'ASC',
-    filters,
-  } = query;
+    const qb = this.userRepository.createQueryBuilder('user');
 
-  const qb = this.userRepository.createQueryBuilder('user');
+    qb.leftJoinAndSelect('user.cash_transaction', 'cash_transaction');
 
-  if (search) {
-    qb.andWhere('user.username LIKE :search', { search: `%${search}%` });
+    if (search) {
+      qb.andWhere('user.username LIKE :search', { search: `%${search}%` });
+    }
+
+    if (filters) {
+      Object.entries(filters).forEach(([key, value]) => {
+        qb.andWhere(`user.${key} = :${key}`, { [key]: value });
+      });
+    }
+
+    qb.orderBy(
+      `user.${sortBy}`,
+      order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC',
+    );
+
+    qb.skip((page - 1) * limit).take(limit);
+
+    const [data, total] = await qb.getManyAndCount();
+
+    const pageCount = Math.ceil(total / limit);
+    const hasNext = page < pageCount;
+    const hasPrev = page > 1;
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        pageCount,
+        hasNext,
+        hasPrev,
+      },
+    };
   }
-
-  if (filters) {
-    Object.entries(filters).forEach(([key, value]) => {
-      qb.andWhere(`user.${key} = :${key}`, { [key]: value });
-    });
-  }
-
-  qb.orderBy(
-    `user.${sortBy}`,
-    order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC',
-  );
-
-  qb.skip((page - 1) * limit).take(limit);
-
-  const [data, total] = await qb.getManyAndCount();
-
-  return {
-    data,
-    meta: {
-      total,
-      page,
-      limit,
-    },
-  };
-}
-
 
   async findOne(id: number) {
     const user = await this.userRepository.findOne({ where: { id } });

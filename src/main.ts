@@ -1,7 +1,7 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ResponseInterceptor } from './common/response/response.interceptor';
-import { ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -13,7 +13,11 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.useGlobalInterceptors(new ResponseInterceptor(reflector));
+  app.useGlobalInterceptors(
+    new ResponseInterceptor(reflector),
+    new ClassSerializerInterceptor(app.get(Reflector)),
+  );
+
   const config = new DocumentBuilder()
     .setTitle('KasKu')
     .setDescription('Api Untuk KasKu')
