@@ -1,73 +1,24 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+
 import { PaginationQueryDto } from 'src/common/dto/pagination-query.dto';
+import { UserRepository } from './repository/user.repository';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
-  ) {}
+  constructor(private readonly userRepository: UserRepository) {}
 
-  async create(createUserDto: CreateUserDto) {
-    const user = this.userRepository.create(createUserDto);
-    return this.userRepository.save(user);
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    return this.userRepository.createUser(createUserDto);
   }
   async findAll(query: PaginationQueryDto) {
-    const {
-      search,
-      page = 1,
-      limit = 10,
-      sortBy = 'id',
-      order = 'ASC',
-      filters,
-    } = query;
-
-    const qb = this.userRepository.createQueryBuilder('user');
-
-    qb.leftJoinAndSelect('user.cash_transaction', 'cash_transaction');
-
-    if (search) {
-      qb.andWhere('user.username LIKE :search', { search: `%${search}%` });
-    }
-
-    if (filters) {
-      Object.entries(filters).forEach(([key, value]) => {
-        qb.andWhere(`user.${key} = :${key}`, { [key]: value });
-      });
-    }
-
-    qb.orderBy(
-      `user.${sortBy}`,
-      order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC',
-    );
-
-    qb.skip((page - 1) * limit).take(limit);
-
-    const [data, total] = await qb.getManyAndCount();
-
-    const pageCount = Math.ceil(total / limit);
-    const hasNext = page < pageCount;
-    const hasPrev = page > 1;
-
-    return {
-      data,
-      meta: {
-        total,
-        page,
-        limit,
-        pageCount,
-        hasNext,
-        hasPrev,
-      },
-    };
+    return this.userRepository.findAllUsers(query);
   }
 
-  async findOne(id: number) {
-    const user = await this.userRepository.findOne({ where: { id } });
+  async findOne(id: number): Promise<User> {
+    const user = await this.userRepository.findUserById(id);
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
