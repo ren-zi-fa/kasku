@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -11,8 +15,17 @@ export class UsersService {
   constructor(private readonly userRepository: UserRepository) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
+    const { username } = createUserDto;
+
+    const existingUser =
+      await this.userRepository.findUsersByUserName(username);
+    if (existingUser) {
+      throw new BadRequestException('Username already exists');
+    }
+
     return this.userRepository.createUser(createUserDto);
   }
+
   async findAll(query: PaginationQueryDto) {
     return this.userRepository.findAllUsers(query);
   }
@@ -46,6 +59,6 @@ export class UsersService {
   }
 
   async findByUsername(username: string) {
-    return this.userRepository.findOne({ where: { username } });
+    return this.userRepository.findUsersByUserName(username);
   }
 }

@@ -6,10 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class UserRepository extends Repository<User> {
-  constructor(
-    private dataSource: DataSource,
-    @InjectRepository(User) private readonly repositoriEntity: Repository<User>,
-  ) {
+  constructor(private dataSource: DataSource) {
     super(User, dataSource.createEntityManager());
   }
 
@@ -67,7 +64,14 @@ export class UserRepository extends Repository<User> {
     const user = this.create(userData);
     return this.save(user);
   }
+
   async findUserById(id: number): Promise<User | null> {
-    return this.repositoriEntity.findOneBy({ id });
+    return this.findOneBy({ id });
+  }
+
+  async findUsersByUserName(username: string): Promise<User> {
+    return this.createQueryBuilder('user')
+      .where('user.username ILIKE :username', { username: `%${username}%` })
+      .getOne();
   }
 }
